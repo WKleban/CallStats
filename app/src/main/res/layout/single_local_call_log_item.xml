@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/single_local_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorWhite">
+
+    <ImageView
+        android:id="@+id/single_local_type_iv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_info_black_24dp" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/single_local_last_call_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/single_local_details_layout"
+        app:layout_constraintStart_toEndOf="@+id/single_local_type_iv"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/single_local_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Nazwa kontaktu"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/single_local_phone_icon_iv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/single_local_phone_number"
+            app:srcCompat="@drawable/ic_call_black_16dp" />
+
+        <TextView
+            android:id="@+id/single_local_call_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:gravity="end"
+            android:text="2020-04-21 16:45:00"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="@+id/single_local_last_call_duration"
+            app:layout_constraintStart_toEndOf="@+id/single_local_last_call_duration"
+            app:layout_constraintTop_toTopOf="@+id/single_local_last_call_duration" />
+
+        <TextView
+            android:id="@+id/single_local_last_call_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:text="Nieodebrane"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="@+id/single_local_phone_icon_iv"
+            app:layout_constraintStart_toEndOf="@+id/single_local_phone_icon_iv"
+            app:layout_constraintTop_toTopOf="@+id/single_local_phone_icon_iv" />
+
+        <TextView
+            android:id="@+id/single_local_phone_number"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="nr telefonu"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/single_local_name" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/single_local_details_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/single_local_more_ib"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@color/colorWhite"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_circle_outline_black_32dp" />
+
+        <TextView
+            android:id="@+id/single_local_counter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1234"
+            android:textColor="@android:color/black"
+            android:textSize="9sp"
+            app:layout_constraintBottom_toBottomOf="@+id/single_local_more_ib"
+            app:layout_constraintEnd_toEndOf="@+id/single_local_more_ib"
+            app:layout_constraintStart_toStartOf="@+id/single_local_more_ib"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/single_local_user_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="4dp"
+            android:text="5g 14m 3s"
+            android:textColor="@android:color/black"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/single_local_more_ib"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

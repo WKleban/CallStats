@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/localCallLogFragment"
+        android:icon="@drawable/ic_call_black_24dp"
+        android:title="Połączenia" />
+    <item
+        android:id="@+id/localContactsFragment"
+        android:icon="@drawable/ic_contact_phone_black_24dp"
+        android:title="Kontakty" />
+    <item
+        android:id="@+id/localMessagesFragment"
+        android:icon="@drawable/ic_message_black_24dp"
+        android:title="Wiadomości" />
+    <!--    <item-->
+    <!--        android:id="@+id/test1Fragment"-->
+    <!--        android:icon="@drawable/ic_cloud_black_24dp"-->
+    <!--        android:title="Archiwum" />-->
+        <item
+            android:id="@+id/testGraphFragment"
+            android:icon="@drawable/ic_cloud_black_24dp"
+            android:title="Test Graph" />
+
+
+<!--    <item-->
+<!--        android:id="@+id/localContactsFragment"-->
+<!--        android:icon="@drawable/ic_record_voice_over_black_24dp"-->
+<!--        android:title="Nie wiem co" />-->
+</menu>

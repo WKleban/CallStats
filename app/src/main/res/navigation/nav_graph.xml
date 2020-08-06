@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/startFragment">
+    <fragment
+        android:id="@+id/startFragment"
+        android:name="pl.wotu.callstats.StartFragment"
+        android:label="fragment_start"
+        tools:layout="@layout/fragment_start" >
+        <action
+            android:id="@+id/action_startFragment_to_localCallLogFragment"
+            app:popUpToInclusive="true"
+            app:popUpTo="@id/startFragment"
+            app:destination="@id/localCallLogFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/localCallLogFragment"
+        android:name="pl.wotu.callstats.LocalCallLogFragment"
+        android:label="fragment_local_call_log"
+        tools:layout="@layout/fragment_local_call_log" >
+        <action
+            android:id="@+id/action_localCallLogFragment_to_firebaseCallLogFragment"
+            app:destination="@id/firebaseCallLogFragment" />
+    </fragment>
+    <activity
+        android:id="@+id/chooseCallMethodActivity"
+        android:name="pl.wotu.callstats.ChooseCallMethodActivity"
+        android:label="activity_choose_call_method"
+        tools:layout="@layout/activity_choose_call_method" />
+    <fragment
+        android:id="@+id/test1Fragment"
+        android:name="pl.wotu.callstats.Test1Fragment"
+        android:label="fragment_call_log_test"
+        tools:layout="@layout/fragment_test1" />
+    <fragment
+        android:id="@+id/firebaseCallLogFragment"
+        android:name="pl.wotu.callstats.FirebaseCallLogFragment"
+        android:label="fragment_firebase_call_log"
+        tools:layout="@layout/fragment_firebase_call_log" />
+    <fragment
+        android:id="@+id/test2Fragment"
+        android:name="pl.wotu.callstats.Test2Fragment"
+        android:label="fragment_test2"
+        tools:layout="@layout/fragment_test2" />
+    <fragment
+        android:id="@+id/testGraphFragment"
+        android:name="pl.wotu.callstats.TestGraphFragment"
+        android:label="fragment_test_graph"
+        tools:layout="@layout/fragment_test_graph" />
+    <fragment
+        android:id="@+id/localContactsFragment"
+        android:name="pl.wotu.callstats.LocalContactsFragment"
+        android:label="fragment_local_contacts"
+        tools:layout="@layout/fragment_local_contacts" />
+</navigation>

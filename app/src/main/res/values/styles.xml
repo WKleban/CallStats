@@ -1,0 +1,24 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        @color/green_A700
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/green_A700</item>
+    </style>
+
+    <style name="DialogTheme" parent="Theme.AppCompat.Light.Dialog.MinWidth">
+        <item name="windowNoTitle">true</item>
+    </style>
+
+<!--    <style name="MyActionBarTheme" parent="ThemeOverlay.AppCompat.Light">-->
+<!--        <item name="android:textColorPrimary">@android:color/white</item>-->
+<!--    </style>-->
+
+    <style name="MyActionBarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:textColor">@android:color/darker_gray</item>
+    </style>
+
+</resources>

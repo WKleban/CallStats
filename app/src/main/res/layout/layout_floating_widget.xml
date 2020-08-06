@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <!--Root container-->
+    <RelativeLayout
+        android:id="@+id/root_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:ignore="UselessParent">
+
+        <!--View while view is collapsed-->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/collapse_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/custom_btn_bg"
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:visibility="visible">
+
+            <!--Icon of floating widget -->
+            <ImageView
+                android:id="@+id/collapsed_iv"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_record_voice_over_black_24dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="ContentDescription" />
+
+            <TextView
+                android:id="@+id/last_call_number_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Numer telefonu"
+                android:textSize="10sp"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/collapsed_iv"
+                app:layout_constraintVertical_bias="0.0" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </RelativeLayout>
+</FrameLayout>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <item
+        android:id="@+id/cloud_upload_menuitem"
+        android:icon="@drawable/ic_cloud_upload_black_24dp"
+        android:title="Wyślij dane"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/firebaseCallLogFragment"
+        android:icon="@drawable/ic_child_care_black_24dp"
+        android:title="FirebaseCallLogFragment" />
+    <item
+        android:id="@+id/firebase_menuitem"
+        android:icon="@drawable/ic_child_care_black_24dp"
+        android:title="Firebase" />
+
+    <item
+        android:id="@+id/settings_menuitem"
+        android:icon="@drawable/ic_settings_black_24dp"
+        android:title="Ustawienia" />
+    <item
+        android:id="@+id/logout_menuitem"
+        android:icon="@drawable/ic_close_black_24dp"
+        android:title="Wyloguj" />
+</menu>
