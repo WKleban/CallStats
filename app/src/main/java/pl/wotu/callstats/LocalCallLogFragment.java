@@ -56,7 +56,12 @@ public class LocalCallLogFragment extends Fragment {
 //    private Set<String> callers;
     private List<UserCallsSummaryModel> userCallsList;
 
-    private List<CallLogModel> listOfEntries;
+    private List<CallLogModel> listOfCalls;
+
+    //TODO to będzie po to żeby pokazać zsumowane rozmowy
+    private List<CallLogModel> listOfCallers;
+    private Set<String> setOfCallers;
+
     private boolean isReadyListOfCalls=false;
 //    private HashSet<CallLogModel> listOfAllCalls;
     private HashMap<String, CallLogUserStatsModel> callLogModelUserCallsModelHashMap;
@@ -109,8 +114,8 @@ public class LocalCallLogFragment extends Fragment {
 
 //        adapter = new LocalCallListAdapter(getActivity(),callerNamesSet,callsPerUserList,callsMap);
 
-        System.out.println("listOfEntries.size()"+listOfEntries.size());
-        adapter = new CallListAdapter(getActivity(),listOfEntries);
+        System.out.println("listOfEntries.size()"+ listOfCalls.size());
+        adapter = new CallListAdapter(getActivity(), listOfCalls);
         Log.d(TAG, "onViewCreated: new adapter");
 
 //
@@ -142,7 +147,7 @@ public class LocalCallLogFragment extends Fragment {
 ////
 //
 //        adapter = new LocalCallListAdapter(getActivity(),listOfLastCallsPerUser,callLogModelUserCallsModelHashMap);
-        adapter = new CallListAdapter(getActivity(),listOfEntries);
+        adapter = new CallListAdapter(getActivity(), listOfCalls);
 
 //        Cursor cursor = getCursor();
 //        if (cursor!=null){
@@ -470,7 +475,7 @@ public class LocalCallLogFragment extends Fragment {
 //        listOfAllCalls = new HashSet<>();
 //        callLogModelUserCallsModelHashMap = new HashMap<>();
 //        listOfLastCallsPerUser = new HashSet<>();
-        listOfEntries = new ArrayList<>();
+        listOfCalls = new ArrayList<>();
         for (int i = 0; i < cursor.getCount(); i++) {
             String phoneNumber = cursor.getString(0);
             int type = Integer.parseInt(cursor.getString(1));
@@ -492,7 +497,7 @@ public class LocalCallLogFragment extends Fragment {
             CallLogModel callLogEntry = new CallLogModel(phoneNumber, type, duration, cachedName, callID, callDate, cachedFormattedNumber, countryISO, lastModified, isNew ,phoneAccountId, androidId, phoneModel);
 
 
-            listOfEntries.add(callLogEntry);
+            listOfCalls.add(callLogEntry);
 
             System.out.println(callLogEntry.getCachedName()+" "+callLogEntry.getCachedFormattedNumber());
             //            CallLogUserStatsModel callLogUserSummary = new CallLogUserStatsModel();
