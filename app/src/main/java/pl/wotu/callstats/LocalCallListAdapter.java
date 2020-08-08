@@ -42,17 +42,27 @@ import static android.widget.Toast.LENGTH_LONG;
 
 class LocalCallListAdapter extends RecyclerView.Adapter<LocalCallListAdapter.LocalCallLogViewHolder> {
 
-    private final FragmentActivity activity;
-    private final Set<String> callers;
-    private final Map<String, UserCallsSummaryModel> callsMap;
-    private final List<UserCallsSummaryModel> userCallsList;
+    private final Activity activity;
+    private final List<CallLogModel> listOfEntries;
+    //    private final FragmentActivity activity;
+//    private final Set<String> callers;
+//    private final Map<String, UserCallsSummaryModel> callsMap;
+//    private final List<UserCallsSummaryModel> userCallsList;
     private Map<String, UserCallsSummaryModel> listOfCalls;
 
-    public LocalCallListAdapter(FragmentActivity activity, Set<String> callerNamesSet, List<UserCallsSummaryModel> userCallsList, Map<String, UserCallsSummaryModel> callsMap) {
+//    public LocalCallListAdapter(FragmentActivity activity, Set<String> callerNamesSet, List<UserCallsSummaryModel> userCallsList, Map<String, UserCallsSummaryModel> callsMap) {
+//        this.activity = activity;
+//        this.callers = callerNamesSet;
+//        this.userCallsList = userCallsList;
+//        this.callsMap = callsMap;
+//    }
+
+    public LocalCallListAdapter(FragmentActivity activity, List<CallLogModel> listOfEntries) {
         this.activity = activity;
-        this.callers = callerNamesSet;
-        this.userCallsList = userCallsList;
-        this.callsMap = callsMap;
+        this.listOfEntries = listOfEntries;
+
+
+
     }
 
     @NonNull
@@ -64,21 +74,21 @@ class LocalCallListAdapter extends RecyclerView.Adapter<LocalCallListAdapter.Loc
 
     @Override
     public void onBindViewHolder(@NonNull final LocalCallLogViewHolder holder, int position) {
-        String phoneNumber = userCallsList.get(position).getPhoneNumber();
-        String cachedFormattedNumber = userCallsList.get(position).getCachedFormattedNumber();
-        String cachedName = userCallsList.get(position).getCachedName();
-        int lastCallType = userCallsList.get(position).getLastCalltype();
-        int durationOfCalls = userCallsList.get(position).getDurationOfCalls();
-        int lastCallDuration = userCallsList.get(position).getLastCallDuration();
+        String phoneNumber = listOfEntries.get(position).getPhoneNumber();
+        String cachedFormattedNumber = listOfEntries.get(position).getCachedFormattedNumber();
+        String cachedName = listOfEntries.get(position).getCachedName();
+        int lastCallType = listOfEntries.get(position).getType();
+        int duration = listOfEntries.get(position).getDuration();
+//        int lastCallDuration = listOfEntries.get(position).getLastCallDuration();
 
-        int lastCallID = userCallsList.get(position).getLastCallID();
-        Date lastCallDate = userCallsList.get(position).getLastCallDate();
-        String countryISO = userCallsList.get(position).getCountryISO();
-        String phoneModel = userCallsList.get(position).getPhoneModel();
-        String phoneAccountId = userCallsList.get(position).getPhoneAccountId();
-        String androidId = userCallsList.get(position).getAndroidId();
-        String cachedNameFromDatabase = userCallsList.get(position).getCachedNameFromDatabase();
-        boolean isDownloadedFromDatabase = userCallsList.get(position).isDownloadedFromDatabase();
+        int lastCallID = listOfEntries.get(position).getCallID();
+        Date lastCallDate = listOfEntries.get(position).getCallDate();
+        String countryISO = listOfEntries.get(position).getCountryISO();
+        String phoneModel = listOfEntries.get(position).getPhoneModel();
+        String phoneAccountId = listOfEntries.get(position).getAndroidId();
+        String androidId = listOfEntries.get(position).getAndroidId();
+        String cachedNameFromDatabase = listOfEntries.get(position).getCachedName();
+        boolean isDownloadedFromDatabase = listOfEntries.get(position).isDownloadedFromDatabase();
 
         String dateString = TimeAgo.callDateFormatter(lastCallDate);
 
@@ -112,8 +122,8 @@ class LocalCallListAdapter extends RecyclerView.Adapter<LocalCallListAdapter.Loc
             holder.phoneNumber_tv.setVisibility(View.GONE);
         }
 
-        String durationString = getFormattedDuration(lastCallDuration);
-        String durationOfUserString = getFormattedDuration(durationOfCalls);
+        String durationString = getFormattedDuration(duration);
+//        String durationOfUserString = getFormattedDuration(durationOfCalls);
 
 
         String callType = "";
@@ -166,12 +176,12 @@ class LocalCallListAdapter extends RecyclerView.Adapter<LocalCallListAdapter.Loc
             holder.last_call_duration_tv.setTextColor(ContextCompat.getColor(holder.type_iv.getContext(), R.color.red_500));
             holder.phone_icon.setColorFilter(ContextCompat.getColor(holder.type_iv.getContext(), R.color.red_500));
         }
-        if (!isNullOrEmpty(durationOfUserString)) {
-            holder.user_duration_tv.setText(durationOfUserString);
-            holder.user_duration_tv.setVisibility(View.VISIBLE);
-        } else {
-            holder.user_duration_tv.setVisibility(View.GONE);
-        }
+//        if (!isNullOrEmpty(durationOfUserString)) {
+//            holder.user_duration_tv.setText(durationOfUserString);
+//            holder.user_duration_tv.setVisibility(View.VISIBLE);
+//        } else {
+//            holder.user_duration_tv.setVisibility(View.GONE);
+//        }
 
         String totalUserCalls = "blablabla";
         holder.single_local_counter.setText("" + totalUserCalls);

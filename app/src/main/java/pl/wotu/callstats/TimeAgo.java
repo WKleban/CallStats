@@ -6,48 +6,19 @@ import java.util.concurrent.TimeUnit;
 
 public class TimeAgo {
 
-//    public static String getTimeAgo(long duration){
-//        Date now = new Date();
-//        long nowPoint = now.getTime();
-//
-//        long seconds = TimeUnit.MILLISECONDS.toSeconds(nowPoint - duration);
-//        long minutes =  TimeUnit.MILLISECONDS.toMinutes(nowPoint - duration);
-//        long hours =  TimeUnit.MILLISECONDS.toHours(nowPoint - duration);
-//        long days =  TimeUnit.MILLISECONDS.toDays(nowPoint - duration);
-//
-//        if(seconds<60){
-//            return "przed chwilą";
-//        }else if(minutes==1){
-//            return "minutę temu";
-//        }else if(minutes>1&&minutes<5){
-//            return minutes + " minuty temu";
-//        }else if(minutes>=5&&minutes<60){
-//            return minutes + " minut temu";
-//        }else if(hours==1){
-//            return "godzinę temu";
-//        }else if((hours>1&&hours<5)||(hours>21&&hours<24)){
-//            return minutes + " godziny temu";
-//        }else if(hours>=5&&hours<=21){
-//            return hours + " godzin temu";
-//        }else if(days==1){
-//            return "wczoraj";
-//        }else{
-//            return days+" dni temu";
-//        }
-//    }
-
     public static String callDateFormatter(Date callDate){
         long duration = callDate.getTime();
         Date nowDate = new Date();
         long now = nowDate.getTime();
-        SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss");
+        String dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+        String timeFormat = "HH:mm:ss";
+        SimpleDateFormat dateFormatter = new SimpleDateFormat(dateTimeFormat);
+        SimpleDateFormat timeFormatter = new SimpleDateFormat(timeFormat);
 
-
-        long seconds = TimeUnit.MILLISECONDS.toSeconds(now - duration);
-        long minutes =  TimeUnit.MILLISECONDS.toMinutes(now - duration);
-        long hours =  TimeUnit.MILLISECONDS.toHours(now - duration);
-        long days =  TimeUnit.MILLISECONDS.toDays(now - duration);
+//        long seconds = TimeUnit.MILLISECONDS.toSeconds(now) - TimeUnit.MILLISECONDS.toSeconds(duration);
+        long minutes =  TimeUnit.MILLISECONDS.toMinutes(now) -  TimeUnit.MILLISECONDS.toMinutes(duration);
+//        long hours =  TimeUnit.MILLISECONDS.toHours(now) -  TimeUnit.MILLISECONDS.toHours(duration);
+        long days =  TimeUnit.MILLISECONDS.toDays(now) -  TimeUnit.MILLISECONDS.toDays(duration);
         String minsAgo = "";
         if (minutes<60){
             switch ((int) minutes){
