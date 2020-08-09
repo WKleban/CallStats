@@ -18,12 +18,17 @@ class CallLogModel {
     private String phoneModel;
     private boolean isDownloadedFromDatabase = false;
 
+    private int durationOfTheWhole;
+    private int numberOfCalls;
+
+
     public CallLogModel() {
     }
 
 
+
     //    CallLogModel callLogEntry = new CallLogModel(phoneNumber, type, duration, cachedName, callID, callDate, cachedFormattedNumber, countryISO, lastModified, isNew ,phoneAccountId, androidId, phoneModel);
-    public CallLogModel(String phoneNumber, int type, int duration, String cachedName, int callID, Date callDate, String cachedFormattedNumber, String countryISO, Date lastModified, boolean isNew, String phoneAccountId, String androidId, String phoneModel) {
+    public CallLogModel(String phoneNumber, int type, int duration, String cachedName, int callID, Date callDate, String cachedFormattedNumber, String countryISO, Date lastModified, boolean isNew, String phoneAccountId, String androidId, String phoneModel,int durationOfTheWhole,int numberOfCalls) {
         this.phoneNumber = phoneNumber;
         this.type = type;
         this.duration = duration;
@@ -38,23 +43,32 @@ class CallLogModel {
         this.phoneModel = phoneModel;
         this.phoneAccountId = phoneAccountId;
         this.isDownloadedFromDatabase = false;
+        this.durationOfTheWhole = durationOfTheWhole;
+        this.numberOfCalls = numberOfCalls;
     }
-    //    CallLogModel callLogEntry = new CallLogModel(phoneNumber, type, duration, cachedName, callID, callDate, cachedFormattedNumber, countryISO, lastModified, isNew ,phoneAccountId, androidId, phoneModel);
-    public CallLogModel(String phoneNumber, int type, int duration, String cachedName, int callID, Date callDate, String cachedFormattedNumber, String countryISO, Date lastModified, boolean isNew, String phoneAccountId, String androidId, String phoneModel,boolean isDownloadedFromDatabase) {
-        this.phoneNumber = phoneNumber;
-        this.type = type;
-        this.duration = duration;
-        this.cachedName = cachedName;
-        this.callID = callID;
-        this.callDate = callDate;
-        this.cachedFormattedNumber = cachedFormattedNumber;
-        this.countryISO = countryISO;
-        this.lastModified = lastModified;
-        this.isNew = isNew;
-        this.androidId = androidId;
-        this.phoneModel = phoneModel;
+
+    public String getPhoneAccountId() {
+        return phoneAccountId;
+    }
+
+    public void setPhoneAccountId(String phoneAccountId) {
         this.phoneAccountId = phoneAccountId;
-        this.isDownloadedFromDatabase = isDownloadedFromDatabase;
+    }
+
+    public int getDurationOfTheWhole() {
+        return durationOfTheWhole;
+    }
+
+    public void setDurationOfTheWhole(int durationOfTheWhole) {
+        this.durationOfTheWhole = durationOfTheWhole;
+    }
+
+    public int getNumberOfCalls() {
+        return numberOfCalls;
+    }
+
+    public void setNumberOfCalls(int numberOfCalls) {
+        this.numberOfCalls = numberOfCalls;
     }
 
     public String getPhoneNumber() {

@@ -181,7 +181,7 @@ public class Test1Fragment extends Fragment {
                 String countryISO = cursor.getString(7);
                 Date lastModified = new Date(Long.parseLong(cursor.getString(8)));
                 boolean isNew = Boolean.parseBoolean(cursor.getString(9));
-                listOfCalls.add(new CallLogModel(phoneNumber, type, duration, cachedName, callID, callDate, cachedFormattedNumber, countryISO, lastModified, isNew, "", androidId, phoneModel));
+                listOfCalls.add(new CallLogModel(phoneNumber, type, duration, cachedName, callID, callDate, cachedFormattedNumber, countryISO, lastModified, isNew, "", androidId, phoneModel,duration,1));
 
                 if (!isNullOrEmpty(cachedName)) {
                     callers.add(cachedName);

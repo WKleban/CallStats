@@ -165,15 +165,22 @@ public class CallHistoryFragment extends Fragment {
             String phoneAccountId = "" + cursor.getString(10);
 
             //Wszystkie połączenia
-            CallLogModel callLogEntry = new CallLogModel(phoneNumber, type, duration, cachedName, callID, callDate, cachedFormattedNumber, countryISO, lastModified, isNew, phoneAccountId, androidId, phoneModel);
+            CallLogModel callLogEntry = new CallLogModel(phoneNumber, type, duration, cachedName, callID, callDate, cachedFormattedNumber, countryISO, lastModified, isNew, phoneAccountId, androidId, phoneModel,duration,1);
 
             //Połączenia z podziałem na użytkowników
             UserCallsSummaryModel userCallsSummaryModel;
 //            UserCallsSummaryModel userCallsSummaryModel = new UserCallsSummaryModel(phoneNumber, cachedFormattedNumber, cachedName, lastCallType, lastCallDuration, lastCallID, lastCallDate, countryISO,phoneModel);
 
+            String caller;
+                if (!CallAppConfig.isNullOrEmpty(cachedName)){
+                    caller = cachedName;
+                }else {
+                    caller = cachedFormattedNumber;
+                }
 
-            if (callers.contains(phoneNumber)) {
-                userCallsSummaryModel = userCallsSummaryMap.get(phoneNumber);
+
+            if (callers.contains(caller)) {
+                userCallsSummaryModel = userCallsSummaryMap.get(caller);
                 int lastCallType = userCallsSummaryModel.getLastCalltype(); //OK
                 int durationOfCalls = userCallsSummaryModel.getDurationOfCalls() + 1; //+1
                 int lastCallID = userCallsSummaryModel.getLastCallID();
@@ -185,14 +192,14 @@ public class CallHistoryFragment extends Fragment {
                 }
                 userCallsSummaryModel.updateSummaryInfo(lastCallType, durationOfCalls, lastCallID, lastCallDate);
             } else {
-                callers.add(phoneNumber);
+                callers.add(caller);
 //                userCallsSummaryModel = new UserCallsSummaryModel(phoneNumber, cachedFormattedNumber, cachedName, type, duration, callID, callDate, countryISO,phoneAccountId, androidId, phoneModel);
 //                userCallsSummaryModel = new UserCallsSummaryModel(phoneNumber, cachedFormattedNumber, cachedName, type, duration, callID, callDate, countryISO,phoneAccountId, androidId, phoneModel);
                 userCallsSummaryModel = new UserCallsSummaryModel(phoneNumber, cachedFormattedNumber, cachedName, 0, 0, 0, 0, null, countryISO, phoneAccountId, androidId, phoneModel);
 
 
                 callLogList.add(callLogEntry);
-                userCallsSummaryMap.put(phoneNumber, userCallsSummaryModel);
+                userCallsSummaryMap.put(caller, userCallsSummaryModel);
 
                 cursor.moveToNext();
 

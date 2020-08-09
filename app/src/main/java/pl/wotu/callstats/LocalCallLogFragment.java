@@ -32,39 +32,43 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class LocalCallLogFragment extends Fragment {
     private static final String TAG = "LocalCallLogFragment";
-    private NavController navController;
-    private RecyclerView recyclerView;
-    private CallListAdapter adapter;
-
-    private Set<String> callerNamesSet;
-    private List<UserCallsSummaryModel> callsPerUserList;
-    private Map<String,UserCallsSummaryModel> callsMap;
 
     private Activity activity;
     private Context context;
 
+    private NavController navController;
+    private RecyclerView recyclerView;
+    private CallListAdapter adapter;
+
+//    private Set<String> callerNamesSet;
+//    private List<UserCallsSummaryModel> callsPerUserList;
+//    private Map<String,UserCallsSummaryModel> callsMap;
+
+
 //    private Set<String> callers;
-    private List<UserCallsSummaryModel> userCallsList;
+//    private List<UserCallsSummaryModel> userCallsList;
 
     private List<CallLogModel> listOfCalls;
+    private List<CallLogModel> listOfCallers;
+
 
     //TODO to będzie po to żeby pokazać zsumowane rozmowy
-    private List<CallLogModel> listOfCallers;
+    private Map<String,CallLogModel> mapOfCallers;
     private Set<String> setOfCallers;
 
     private boolean isReadyListOfCalls=false;
 //    private HashSet<CallLogModel> listOfAllCalls;
-    private HashMap<String, CallLogUserStatsModel> callLogModelUserCallsModelHashMap;
+//    private HashMap<String, CallLogUserStatsModel> callLogModelUserCallsModelHashMap;
 
 
 
@@ -101,10 +105,15 @@ public class LocalCallLogFragment extends Fragment {
 
         navController = Navigation.findNavController(view);
 
-        callerNamesSet = new TreeSet<>();
-        callsPerUserList = new ArrayList<>();
-        callsMap = new HashMap<>();
-        userCallsList = new ArrayList<>();
+//        callerNamesSet = new TreeSet<>();
+//        callsPerUserList = new ArrayList<>();
+//        callsMap = new HashMap<>();
+//        userCallsList = new ArrayList<>();
+
+
+        mapOfCallers = new HashMap<>();
+        setOfCallers = new HashSet<>();
+
 
 
 
@@ -115,7 +124,7 @@ public class LocalCallLogFragment extends Fragment {
 //        adapter = new LocalCallListAdapter(getActivity(),callerNamesSet,callsPerUserList,callsMap);
 
         System.out.println("listOfEntries.size()"+ listOfCalls.size());
-        adapter = new CallListAdapter(getActivity(), listOfCalls);
+        adapter = new CallListAdapter(getActivity(), listOfCallers);
         Log.d(TAG, "onViewCreated: new adapter");
 
 //
@@ -476,6 +485,8 @@ public class LocalCallLogFragment extends Fragment {
 //        callLogModelUserCallsModelHashMap = new HashMap<>();
 //        listOfLastCallsPerUser = new HashSet<>();
         listOfCalls = new ArrayList<>();
+        listOfCallers = new ArrayList<>();
+
         for (int i = 0; i < cursor.getCount(); i++) {
             String phoneNumber = cursor.getString(0);
             int type = Integer.parseInt(cursor.getString(1));
@@ -490,16 +501,46 @@ public class LocalCallLogFragment extends Fragment {
             String phoneAccountId = cursor.getString(10);
 //            if (isNullOrEmpty(cachedFormattedNumber)){cachedFormattedNumber="Numer prywatny";}
 //            if (isNullOrEmpty(cachedName)){cachedName = cachedFormattedNumber;}
-
 //            if (isNullOrEmpty(cachedName)){cachedName="Numer prywatny";}
 
 
-            CallLogModel callLogEntry = new CallLogModel(phoneNumber, type, duration, cachedName, callID, callDate, cachedFormattedNumber, countryISO, lastModified, isNew ,phoneAccountId, androidId, phoneModel);
+            CallLogModel callLogSingleEntry = new CallLogModel(phoneNumber, type, duration, cachedName, callID, callDate, cachedFormattedNumber, countryISO, lastModified, isNew ,phoneAccountId, androidId, phoneModel,duration,1);
+            listOfCalls.add(callLogSingleEntry);
+
+            String caller;
+            if (!CallAppConfig.isNullOrEmpty(cachedName)){
+                caller = cachedName;
+            }else {
+                caller = cachedFormattedNumber;
+            }
 
 
-            listOfCalls.add(callLogEntry);
+            setOfCallers.add(caller);
+//            int indexOfEntry = 0;
+            CallLogModel callLogUserEntry;
+            if (mapOfCallers.containsKey(caller)){
+                callLogUserEntry = mapOfCallers.get(caller);
+                int indexOfEntry = listOfCallers.indexOf(callLogUserEntry);
+                callLogUserEntry.setNumberOfCalls(callLogUserEntry.getNumberOfCalls()+1);
+                callLogUserEntry.setDurationOfTheWhole(callLogUserEntry.getDurationOfTheWhole()+duration);
 
-            System.out.println(callLogEntry.getCachedName()+" "+callLogEntry.getCachedFormattedNumber());
+                listOfCallers.remove(indexOfEntry);
+                listOfCallers.add(indexOfEntry,callLogUserEntry);
+
+            }else {
+                callLogUserEntry = callLogSingleEntry;
+                listOfCallers.add(callLogUserEntry);
+            }
+
+
+            //TODO tutaj będzie sumaryczna liczba i czas rozmów
+//            setOfCallers.add(cachedFormattedNumber);
+//            listOfCallers.get(cachedFormattedNumber);
+            mapOfCallers.put(caller,callLogUserEntry);
+
+            System.out.println(callLogSingleEntry.getCachedName()+" "+callLogSingleEntry.getCachedFormattedNumber());
+
+
             //            CallLogUserStatsModel callLogUserSummary = new CallLogUserStatsModel();
 
 //            listOfAllCalls.add(callLogEntry);

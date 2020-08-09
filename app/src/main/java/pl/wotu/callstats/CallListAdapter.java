@@ -51,7 +51,10 @@ public class CallListAdapter extends RecyclerView.Adapter<CallListAdapter.CallLo
         String cachedFormattedNumber = listOfEntries.get(position).getCachedFormattedNumber();
         String cachedName = listOfEntries.get(position).getCachedName();
         int lastCallType = listOfEntries.get(position).getType();
+        int durationOfTheWhole = listOfEntries.get(position).getDurationOfTheWhole();
         int duration = listOfEntries.get(position).getDuration();
+        int numberOfCalls = listOfEntries.get(position).getNumberOfCalls();
+
 //        int lastCallDuration = listOfEntries.get(position).getLastCallDuration();
 
         int lastCallID = listOfEntries.get(position).getCallID();
@@ -122,7 +125,7 @@ public class CallListAdapter extends RecyclerView.Adapter<CallListAdapter.CallLo
         });
 
         String durationString = getFormattedDuration(duration);
-//        String durationOfUserString = getFormattedDuration(duration);
+        String durationOfTheWholeString = getFormattedDuration(durationOfTheWhole);
 
 
         String callType = "";
@@ -175,15 +178,15 @@ public class CallListAdapter extends RecyclerView.Adapter<CallListAdapter.CallLo
             holder.last_call_duration_tv.setTextColor(ContextCompat.getColor(holder.type_iv.getContext(), R.color.red_500));
             holder.phone_icon.setColorFilter(ContextCompat.getColor(holder.type_iv.getContext(), R.color.red_500));
         }
-        if (!isNullOrEmpty(durationString)) {
-            holder.user_duration_tv.setText(durationString);
+        if (!isNullOrEmpty(durationOfTheWholeString)) {
+            holder.user_duration_tv.setText(durationOfTheWholeString);
             holder.user_duration_tv.setVisibility(View.VISIBLE);
         } else {
             holder.user_duration_tv.setVisibility(View.GONE);
         }
 
-        String totalUserCalls = "1";
-        holder.single_local_counter.setText("" + totalUserCalls);
+//        String totalUserCalls = "1";
+        holder.single_local_counter.setText("" + numberOfCalls);
 
 
 
