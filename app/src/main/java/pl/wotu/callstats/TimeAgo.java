@@ -1,19 +1,32 @@
 package pl.wotu.callstats;
 
+import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
+import java.time.Month;
+import java.time.format.TextStyle;
 import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class TimeAgo {
 
     public static String callDateFormatter(Date callDate){
+        if (callDate==null){
+            return "";
+        }
         long duration = callDate.getTime();
         Date nowDate = new Date();
         long now = nowDate.getTime();
-        String dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+        String dateTimeFormat = "d MMMM HH:mm";
+//        String dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
         String timeFormat = "HH:mm:ss";
-        SimpleDateFormat dateFormatter = new SimpleDateFormat(dateTimeFormat);
+        String monthFormat = "MM";
+        SimpleDateFormat dateFormatter = new SimpleDateFormat(dateTimeFormat,DateFormatSymbols.getInstance(Locale.forLanguageTag("pl-PL"))); //Z polskimi nazwami miesięcy
         SimpleDateFormat timeFormatter = new SimpleDateFormat(timeFormat);
+
+
+        DateFormatSymbols dfs = new DateFormatSymbols();
+        String[] months = dfs.getMonths();
 
 //        long seconds = TimeUnit.MILLISECONDS.toSeconds(now) - TimeUnit.MILLISECONDS.toSeconds(duration);
         long minutes =  TimeUnit.MILLISECONDS.toMinutes(now) -  TimeUnit.MILLISECONDS.toMinutes(duration);
@@ -58,6 +71,9 @@ public class TimeAgo {
         }else if (days==1) {
                 return "Wczoraj o "+timeFormatter.format(callDate);
         }else{
+
+
+
             return dateFormatter.format(callDate);
         }
     }

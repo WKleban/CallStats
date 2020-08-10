@@ -33,6 +33,29 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
+            android:id="@+id/single_local_sms_date"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="start"
+            android:text="21 kw. 16:45"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="@+id/single_local_sms_icon_iv"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/single_local_last_call_duration"
+            app:layout_constraintTop_toTopOf="@+id/single_local_sms_icon_iv" />
+
+        <TextView
+            android:id="@+id/single_local_sms_body"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Treść wiadomości..."
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/single_local_sms_icon_iv" />
+
+        <TextView
             android:id="@+id/single_local_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -47,7 +70,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/single_local_phone_number"
             app:srcCompat="@drawable/ic_call_black_16dp" />
@@ -58,7 +80,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:gravity="end"
-            android:text="2020-04-21 16:45:00"
+            android:text="21 kw. 16:45"
             android:textSize="10sp"
             app:layout_constraintBottom_toBottomOf="@+id/single_local_last_call_duration"
             app:layout_constraintStart_toEndOf="@+id/single_local_last_call_duration"
@@ -85,6 +107,15 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/single_local_name" />
+
+        <ImageView
+            android:id="@+id/single_local_sms_icon_iv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/single_local_phone_icon_iv"
+            app:srcCompat="@drawable/ic_baseline_sms_16" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout

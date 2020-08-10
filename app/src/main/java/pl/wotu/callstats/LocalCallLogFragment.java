@@ -2,15 +2,18 @@ package pl.wotu.callstats;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.CallLog;
 import android.provider.Settings;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,10 +33,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -50,14 +55,6 @@ public class LocalCallLogFragment extends Fragment {
     private RecyclerView recyclerView;
     private CallListAdapter adapter;
 
-//    private Set<String> callerNamesSet;
-//    private List<UserCallsSummaryModel> callsPerUserList;
-//    private Map<String,UserCallsSummaryModel> callsMap;
-
-
-//    private Set<String> callers;
-//    private List<UserCallsSummaryModel> userCallsList;
-
     private List<CallLogModel> listOfCalls;
     private List<CallLogModel> listOfCallers;
 
@@ -67,12 +64,6 @@ public class LocalCallLogFragment extends Fragment {
     private Set<String> setOfCallers;
 
     private boolean isReadyListOfCalls=false;
-//    private HashSet<CallLogModel> listOfAllCalls;
-//    private HashMap<String, CallLogUserStatsModel> callLogModelUserCallsModelHashMap;
-
-
-
-//    private HashSet <CallLogModel> listOfLastCallsPerUser;
 
     public LocalCallLogFragment() {
         // Required empty public constructor
@@ -87,11 +78,7 @@ public class LocalCallLogFragment extends Fragment {
         activity = getActivity();
         context = activity.getApplicationContext();
 
-//        db = FirebaseFirestore.getInstance();
-//        mAuth = FirebaseAuth.getInstance();
-
         return inflater.inflate(R.layout.fragment_local_call_log, container, false);
-
     }
 
     @Override
@@ -105,29 +92,18 @@ public class LocalCallLogFragment extends Fragment {
 
         navController = Navigation.findNavController(view);
 
-//        callerNamesSet = new TreeSet<>();
-//        callsPerUserList = new ArrayList<>();
-//        callsMap = new HashMap<>();
-//        userCallsList = new ArrayList<>();
-
+//        getAllSms();
 
         mapOfCallers = new HashMap<>();
         setOfCallers = new HashSet<>();
 
-
-
-
         if (!isReadyListOfCalls) {
-            setCallLogToList(getCursor());
+            setCallLogToList(getCallLogCursor(),getAllSms());
         }
-
-//        adapter = new LocalCallListAdapter(getActivity(),callerNamesSet,callsPerUserList,callsMap);
 
         System.out.println("listOfEntries.size()"+ listOfCalls.size());
         adapter = new CallListAdapter(getActivity(), listOfCallers);
         Log.d(TAG, "onViewCreated: new adapter");
-
-//
 
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager mLayoutManager =new LinearLayoutManager(getActivity()) ;
@@ -136,317 +112,11 @@ public class LocalCallLogFragment extends Fragment {
         recyclerView.addItemDecoration(mDividerItemDecoration);
         recyclerView.setAdapter(adapter);
 
-
-
-
-//        listOfAllCalls = new ArrayList<>();
-//        listOfLastCallsPerUser = new ArrayList<>();
-//
-//
-//        userCallsSummaryMap = new HashMap<>();
-//        callLogList = new ArrayList<>();
-//
-//
-//        callers = new TreeSet<>();
-//        callersFromCloud = new HashMap<>();  //Pobrane z chmury
-//        callLogModelUserCallsModelHashMap = new HashMap<>();
-
-////
-//        userCalls = new HashMap<>();
-////
-//
-//        adapter = new LocalCallListAdapter(getActivity(),listOfLastCallsPerUser,callLogModelUserCallsModelHashMap);
         adapter = new CallListAdapter(getActivity(), listOfCalls);
-
-//        Cursor cursor = getCursor();
-//        if (cursor!=null){
-//        }else {
-//            Toast.makeText(getActivity(),"Liczba pozycji po wykonaniu getCursor() = null",Toast.LENGTH_LONG).show();
-//        }
-
-
+//        getSMSCursor();
     }
 
-
-//    private void setCallLogToList(Cursor cursor) {
-//
-//        String phoneModel = Build.MANUFACTURER+" "+ Build.MODEL;
-//        String androidId = Settings.Global.getString(context.getContentResolver(), Settings.Global.DEVICE_NAME);
-//        System.out.println("phoneModel = "+phoneModel);
-//        System.out.println("androidId = "+androidId);
-//
-//
-//        for (int i = 0; i < cursor.getCount(); i++) {
-//            String phoneNumber = ""+cursor.getString(0);
-//            int type = Integer.parseInt(cursor.getString(1));
-//            int duration = Integer.parseInt(cursor.getString(2));
-//            String cachedName = ""+cursor.getString(3);
-//            int callID = Integer.parseInt(cursor.getString(4));
-//            Date callDate = new Date(Long.parseLong(cursor.getString(5)));
-//            String cachedFormattedNumber = ""+cursor.getString(6);
-//            String countryISO = ""+cursor.getString(7);
-//            Date lastModified = new Date(Long.parseLong(cursor.getString(8)));
-//            boolean isNew = Boolean.parseBoolean(cursor.getString(9));
-//            String phoneAccountId = ""+cursor.getString(10);
-//
-//            //Wszystkie połączenia
-//            CallLogModel callLogEntry = new CallLogModel(phoneNumber, type, duration, cachedName, callID, callDate, cachedFormattedNumber, countryISO, lastModified, isNew ,phoneAccountId, androidId, phoneModel);
-//
-//            //Połączenia z podziałem na użytkowników
-//            UserCallsSummaryModel userCallsSummaryModel;
-////            UserCallsSummaryModel userCallsSummaryModel = new UserCallsSummaryModel(phoneNumber, cachedFormattedNumber, cachedName, lastCallType, lastCallDuration, lastCallID, lastCallDate, countryISO,phoneModel);
-//
-//
-//            if (callers.contains(phoneNumber)){
-//                userCallsList.get(0).get(phoneNumber);
-////                userCallsSummaryModel = .get(phoneNumber);
-//                int lastCallType = userCallsSummaryModel.getLastCalltype(); //OK
-//                int durationOfCalls = userCallsSummaryModel.getDurationOfCalls() + 1; //+1
-//                int lastCallID = userCallsSummaryModel.getLastCallID();
-//                Date lastCallDate = userCallsSummaryModel.getLastCallDate();
-//
-//                if (callDate.getTime()>lastCallDate.getTime()){
-//                    lastCallDate = callDate;
-//                    lastCallID = callID;
-//                }
-//                userCallsSummaryModel.updateSummaryInfo(lastCallType,durationOfCalls,lastCallID,lastCallDate);
-//            }else {
-//                callers.add(phoneNumber);
-//
-//
-//
-//
-////    public UserCallsSummaryModel(String phoneNumber,
-////                        String cachedFormattedNumber,
-////                        String cachedName,
-////                int lastCalltype,
-////                int durationOfCalls,
-////                int lastCallDuration,
-////                int lastCallID,
-////                Date lastCallDate,
-////                String countryISO,
-////                String phoneAccountId,
-////                String androidId,
-////                String phoneModel){
-//
-//                userCallsSummaryModel = new UserCallsSummaryModel(phoneNumber, cachedFormattedNumber, cachedName, type, duration, callID, callDate, countryISO,phoneAccountId, androidId, phoneModel);
-//            }
-//
-//            callLogList.add(callLogEntry);
-//            userCallsSummaryMap.put(phoneNumber,userCallsSummaryModel);
-//
-//            cursor.moveToNext();
-//
-//        }
-////        Log.d("listOfLastCallsPerUser size",""+listOfLastCallsPerUser.size());
-////        Log.d("listOfAllCalls size",""+listOfAllCalls.size());
-//
-////        TODO FIREBASE
-//        CollectionReference collectionReference = db.collection("Users").document("testUser").collection("Contacts");
-//        collectionReference.orderBy("phoneNumber", Query.Direction.ASCENDING).addSnapshotListener(new EventListener<QuerySnapshot>() {
-//            @Override
-//            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-////                String doc_id="";
-//                String tempPhoneNumber = "";
-//                String tempCachedName = "";
-//
-//                try{
-//                    for (DocumentChange doc : queryDocumentSnapshots.getDocumentChanges()) {
-////                        doc_id = doc.getDocument().getId();
-//                        if (doc.getDocument().contains("phoneNumber")) {
-//                            tempPhoneNumber = doc.getDocument().get("phoneNumber").toString();
-//                        }
-//                        if (doc.getDocument().contains("cachedName")) {
-//                            tempCachedName = doc.getDocument().get("cachedName").toString();
-//                        }
-//                        if (callers.contains(tempPhoneNumber)){
-//                            UserCallsSummaryModel userCallsSummaryModel = userCallsSummaryMap.get(tempPhoneNumber);
-//                            userCallsSummaryModel.updateFromDatabase(true,tempCachedName);
-//                            if ((doc.getType() == DocumentChange.Type.ADDED)|| (doc.getType() == DocumentChange.Type.MODIFIED)){
-//                                userCallsSummaryMap.put(tempPhoneNumber,userCallsSummaryModel);
-//                                userCallsSummaryMap.notifyAll();
-//                            }
-//                        } //Jeśli nie ma na liście tempPhoneNumber to nie rób nic z tym
-//                    }
-//
-//                }catch (NullPointerException nullPointerException){
-//                    Toast.makeText(activity,"Nie udało się pobrać danych :(",Toast.LENGTH_LONG).show();
-//                    System.out.println("Nie udało się pobrać danych :("+e.getMessage());
-//                }
-//            }
-//        });
-//
-////
-////
-////        collectionReference
-////                .orderBy("phoneNumber", Query.Direction.ASCENDING)
-////                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-////                    @Override
-////                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-////                        String contactName = "";
-////                        String doc_id = "";
-////                        try {
-////                            for (DocumentChange doc : queryDocumentSnapshots.getDocumentChanges()) {
-////                                doc_id = doc.getDocument().getId();
-////                                String tempCachedName = "";
-////                                String tempPhoneNumber = "";
-////                                if (doc.getDocument().contains("cachedName")) {
-////                                    tempCachedName = doc.getDocument().get("cachedName").toString();
-////                                }
-////                                if (doc.getDocument().contains("formattedCachedNumber")) {
-////                                    tempPhoneNumber = doc.getDocument().get("phoneNumber").toString();
-////                                }
-////
-////                                if (doc.getType() == DocumentChange.Type.ADDED) {
-////                                    if(callers.contains(doc_id)){
-////                                        System.out.println("+Snapshot ADDED doc_id"+doc_id+" tempPhoneNumber"+tempPhoneNumber+" tempCachedName"+tempCachedName);
-////                                        CallLogUserStatsModel tempCallLogUserStatsModel = callLogModelUserCallsModelHashMap.get(doc_id);
-////                                        if(tempCallLogUserStatsModel!=null) {
-////                                            if (!tempCallLogUserStatsModel.getDownloadedFromCloud()) {
-////                                                if (doc.getDocument().contains("cachedName")) {
-////                                                    if (!isNullOrEmpty(doc.getDocument().get("cachedName").toString())) {
-////                                                        contactName = doc.getDocument().get("cachedName").toString();
-////                                                        tempCallLogUserStatsModel.setNameFromCloud(contactName);
-////                                                        tempCallLogUserStatsModel.setDownloadedFromCloud(true);
-////                                                        callLogModelUserCallsModelHashMap.put(doc_id,tempCallLogUserStatsModel);
-////                                                        System.out.println("ADDED: " + doc_id + " ->" + contactName);
-////
-////                                                        adapter.notifyDataSetChanged();
-////                                                    }
-////                                                }
-////                                            }
-////                                        }
-////                                    }else {
-////                                        System.out.println("-Snapshot ADDED doc_id"+doc_id+" tempPhoneNumber "+tempPhoneNumber+" tempCachedName "+tempCachedName);
-////                                    }
-////
-////
-////                                }else if (doc.getType() == DocumentChange.Type.MODIFIED) {
-////                                    System.out.println("Snapshot MODIFIED doc_id"+doc_id+" tempPhoneNumber "+tempPhoneNumber+" tempCachedName "+tempCachedName);
-////                                }else if (doc.getType() == DocumentChange.Type.REMOVED) {
-////                                    System.out.println("Snapshot REMOVED doc_id"+doc_id+" tempPhoneNumber "+tempPhoneNumber+" tempCachedName "+tempCachedName);
-////                                }
-////
-////                                synchronized(callLogModelUserCallsModelHashMap){
-////                                    callLogModelUserCallsModelHashMap.notify();
-////                                }
-////
-////
-////                            }
-////
-////                            int i=0;
-////                            for (String caller:callers) {
-////                                i++;
-//////                                                     System.out.println("Caller: "+i+" "+caller);
-////                                if (callLogModelUserCallsModelHashMap.containsKey(caller)){
-////                                    System.out.println("Pobrany z bazy: "  +caller+" "+callLogModelUserCallsModelHashMap.get(caller).getDownloadedFromCloud());
-////                                }else {
-////                                    System.out.println("Nie znaleziono: " +caller);
-////                                }
-////                            }
-////
-//////                                                 callLogModelUserCallsModelHashMap.notifyAll();
-////                        }catch (NullPointerException e1){
-////                            Toast.makeText(activity,"Nie udało się pobrać danych :(",Toast.LENGTH_LONG).show();
-////                            System.out.println("Nie udało się pobrać danych :("+e1.getMessage());
-////                        }
-//////                                             x = tempCallLogUserStatsModel;
-////                        adapter.notifyDataSetChanged();
-////
-////                    }
-////
-////                });
-//
-//
-////
-//////
-////        collectionReference
-////                .orderBy("phoneNumber", Query.Direction.ASCENDING)
-////                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-////
-////                    @Override
-////                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-////                        String contactName = "";
-////                        String doc_id = "";
-////                        try{
-////                            for (DocumentChange doc : queryDocumentSnapshots.getDocumentChanges()) {
-////                                doc_id = doc.getDocument().getId();
-////                                String tempCachedName = "";
-////                                String tempFormattedCachedNumber = "";
-////                                if (doc.getDocument().contains("cachedName")) {
-////                                    tempCachedName = doc.getDocument().get("cachedName").toString();
-////                                }
-////                                if (doc.getDocument().contains("formattedCachedNumber")) {
-////                                    tempFormattedCachedNumber = doc.getDocument().get("formattedCachedNumber").toString();
-////                                }
-//////                                String tempCachedName = doc.getDocument().get("cachedName").toString();
-//////                                String tempFormattedCachedNumber = doc.getDocument().get("formattedCachedNumber").toString();
-//////                                System.out.println("doc.getDocument().getId() = "+doc_id);
-////
-////                                if (doc.getType() == DocumentChange.Type.ADDED) {
-////                                    CallLogUserStatsModel tempCallLogUserStatsModel = callLogModelUserCallsModelHashMap.get(tempFormattedCachedNumber);
-////                                    if (tempCallLogUserStatsModel!=null) {
-////
-////                                        System.out.println("tempCallLogUserStatsModel!=null :(");
-////                                        if (!tempCallLogUserStatsModel.getDownloadedFromCloud()) {
-////                                            if (doc.getDocument().contains("cachedName")) {
-////                                                if (!isNullOrEmpty(doc.getDocument().get("cachedName").toString())) {
-////                                                    contactName = doc.getDocument().get("cachedName").toString();
-////                                                    tempCallLogUserStatsModel.setNameFromCloud(contactName);
-////                                                    tempCallLogUserStatsModel.setDownloadedFromCloud(true);
-////                                                    System.out.println("ADDED: " + doc_id + " ->" + contactName);
-////                                                }
-////                                            }
-////                                        }
-////                                    }
-////                                    else{
-////                                        System.out.println("doc.getDocument().getId() = "+doc_id+" tempCallLogUserStatsModel==null :(");
-////                                    }
-////                                } else if (doc.getType() == DocumentChange.Type.MODIFIED) {
-//////                                    (""+cachedFormattedNumber
-////                                    CallLogUserStatsModel tempCallLogUserStatsModel = callLogModelUserCallsModelHashMap.get(""+doc_id);
-////                                    if (tempCallLogUserStatsModel!=null) {
-////                                        if (!tempCallLogUserStatsModel.getDownloadedFromCloud()) {
-////                                            if (doc.getDocument().contains("cachedName")) {
-////                                                if (!isNullOrEmpty(doc.getDocument().get("cachedName").toString())) {
-////                                                    contactName = doc.getDocument().get("cachedName").toString();
-////                                                    tempCallLogUserStatsModel.setNameFromCloud(""+contactName);
-////                                                    tempCallLogUserStatsModel.setDownloadedFromCloud(true);
-////                                                    System.out.println("MODIFIED: " + doc_id + " ->" + contactName);
-////                                                }
-////                                            }
-////                                        }
-////                                    }
-////                                } else if (doc.getType() == DocumentChange.Type.REMOVED) {
-//////                                    list.remove(doc.getOldIndex());
-//////                                    mAdapter.notifyItemRemoved(doc.getOldIndex());
-//////                                    getSupportActionBar().setTitle("Users ("+list.size()+")");
-////                                }
-////                            }
-////
-////                            adapter.notifyDataSetChanged();
-////
-//////                            Toast.makeText(activity,"Liczba pobranych z bazy: "+callersFromCloud.size(),Toast.LENGTH_LONG).show();
-//////                            for (CallLogModel call:listOfAllCalls) {
-//////                                if(call.getCachedName()==call.getCachedFormattedNumber()){
-//////                                    String newName = callersFromCloud.get(call.getCachedName());
-//////                                    call.setDownloadedFromDatabase(true);
-//////                                    call.setCachedName(newName);
-//////                                }
-//////                            }
-////
-////
-////                        }catch (NullPointerException e1){
-////                            Toast.makeText(activity,"Nie udało się pobrać danych :(",Toast.LENGTH_LONG).show();
-////                            System.out.println("Nie udało się pobrać danych :("+e1.getMessage());
-////                        }
-////                    }
-////                });
-//
-//
-//    }
-
-    private void setCallLogToList(Cursor cursor) {
+    private void setCallLogToList(Cursor cursor, List<Sms> allSms) {
 
         String phoneModel = Build.MANUFACTURER+" "+ Build.MODEL;
         String androidId = Settings.Global.getString(context.getContentResolver(), Settings.Global.DEVICE_NAME);
@@ -480,10 +150,7 @@ public class LocalCallLogFragment extends Fragment {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-//        callers = new TreeSet<>();
-//        listOfAllCalls = new HashSet<>();
-//        callLogModelUserCallsModelHashMap = new HashMap<>();
-//        listOfLastCallsPerUser = new HashSet<>();
+
         listOfCalls = new ArrayList<>();
         listOfCallers = new ArrayList<>();
 
@@ -507,12 +174,12 @@ public class LocalCallLogFragment extends Fragment {
             CallLogModel callLogSingleEntry = new CallLogModel(phoneNumber, type, duration, cachedName, callID, callDate, cachedFormattedNumber, countryISO, lastModified, isNew ,phoneAccountId, androidId, phoneModel,duration,1);
             listOfCalls.add(callLogSingleEntry);
 
-            String caller;
-            if (!CallAppConfig.isNullOrEmpty(cachedName)){
-                caller = cachedName;
-            }else {
-                caller = cachedFormattedNumber;
-            }
+            String caller = simplifyPhoneNumber(cachedFormattedNumber);
+//            if (!CallAppConfig.isNullOrEmpty(cachedName)){
+//                caller = cachedFormattedNumber;
+//            }else {
+//                caller = cachedFormattedNumber;
+//            }
 
 
             setOfCallers.add(caller);
@@ -530,6 +197,7 @@ public class LocalCallLogFragment extends Fragment {
             }else {
                 callLogUserEntry = callLogSingleEntry;
                 listOfCallers.add(callLogUserEntry);
+                mapOfCallers.put(caller,callLogUserEntry);
             }
 
 
@@ -538,226 +206,237 @@ public class LocalCallLogFragment extends Fragment {
 //            listOfCallers.get(cachedFormattedNumber);
             mapOfCallers.put(caller,callLogUserEntry);
 
-            System.out.println(callLogSingleEntry.getCachedName()+" "+callLogSingleEntry.getCachedFormattedNumber());
-
-
-            //            CallLogUserStatsModel callLogUserSummary = new CallLogUserStatsModel();
-
-//            listOfAllCalls.add(callLogEntry);
-//            userCallsList.add(callLogEntry);
-
-//            if(!callers.contains(""+phoneNumber)){
-//                callers.add(""+phoneNumber);
-//                callLogUserSummary = new CallLogUserStatsModel(duration, 1,cachedName,false);
-//                callLogModelUserCallsModelHashMap.put(""+cachedFormattedNumber, callLogUserSummary);
-////                System.out.println("Pierwszy raz ->"+cachedName+", duration="+duration+", count=1");
-//                listOfLastCallsPerUser.add(callLogEntry);
-//            }
-//            else{
-//                callLogUserSummary = callLogModelUserCallsModelHashMap.get(""+cachedFormattedNumber);
-//                int summaryDuration = callLogUserSummary.getDuration() + duration;
-//                int summaryCount = callLogUserSummary.getCount() + 1;
-//                callLogUserSummary.setDuration(summaryDuration);
-//                callLogUserSummary.setCount(summaryCount);
-////                System.out.println("Kolejny raz ->"+cachedName+", duration="+summaryDuration+", count="+summaryCount);
-//            }
-
-//            if(!callers.contains(""+cachedName)){
-//                callers.add(""+cachedName);
-//                callLogUserSummary = new CallLogUserStatsModel(duration, 1);
-//                callLogModelUserCallsModelHashMap.put(""+cachedName, callLogUserSummary);
-////                System.out.println("Pierwszy raz ->"+cachedName+", duration="+duration+", count=1");
-//                listOfLastCallsPerUser.add(callLogEntry);
-//            }else{
-//                callLogUserSummary = callLogModelUserCallsModelHashMap.get(""+cachedName);
-//                int summaryDuration = callLogUserSummary.getDuration() + duration;
-//                int summaryCount = callLogUserSummary.getCount() + 1;
-//                callLogUserSummary.setDuration(summaryDuration);
-//                callLogUserSummary.setCount(summaryCount);
-////                System.out.println("Kolejny raz ->"+cachedName+", duration="+summaryDuration+", count="+summaryCount);
-//            }
+//            System.out.println(callLogSingleEntry.getCachedName()+" "+callLogSingleEntry.getCachedFormattedNumber());
 
             cursor.moveToNext();
+
+        }
+        for (Sms sms:allSms) {
+            //TODO trzeba będzie uprościć całość do SmsModel
+            SmsModel smsModel = new SmsModel(sms._id,sms._address,sms._msg,sms._readState,sms._time,sms._folderName);
+
+            CallLogModel callLogSingleEntry = new CallLogModel(sms._address, 0, 0, sms._address, 0,  null,sms._address, null, null, false ,null, androidId, phoneModel,0,1);
+            listOfCalls.add(callLogSingleEntry);
+
+            String caller = simplifyPhoneNumber(sms._address);
+//            if (!CallAppConfig.isNullOrEmpty(sms._address)){
+//                caller = simplifyPhoneNumber(sms._address);
+//            }else {
+//                caller = sms._address;
+//            }
+            CallLogModel callLogUserEntry;
+            if(setOfCallers.contains(caller)){
+                callLogUserEntry = mapOfCallers.get(caller);
+                if (callLogUserEntry==null){
+                    callLogUserEntry = new CallLogModel();
+                }
+                if (callLogUserEntry.getLastSms()==null){
+                    callLogUserEntry.setLastSms(smsModel);
+                }else {
+                    //Głupie rozwiązanie ale działa
+                    long x = Long.parseLong(smsModel.get_time().trim());
+                    long y = Long.parseLong(callLogUserEntry.getLastSms().get_time());
+                    if(x>y){
+                        callLogUserEntry.setLastSms(smsModel);
+                    }
+                }
+
+
+                if (listOfCallers.contains(callLogUserEntry)){
+                    int indexOfEntry = listOfCallers.indexOf(callLogUserEntry);
+                    listOfCallers.remove(indexOfEntry);
+                    listOfCallers.add(indexOfEntry,callLogUserEntry);
+                }else {
+                    listOfCallers.add(callLogUserEntry);
+                }
+
+
+            }else {
+                callLogUserEntry = new CallLogModel(smsModel,null);
+
+
+                setOfCallers.add(caller);
+            }
+
+
+//            int indexOfEntry = 0;
+
+            if (mapOfCallers.containsKey(caller)){
+
+
+//                callLogUserEntry.setNumberOfCalls(callLogUserEntry.getNumberOfCalls()+1);
+//                callLogUserEntry.setDurationOfTheWhole(callLogUserEntry.getDurationOfTheWhole()+duration);
+
+
+
+            }else {
+                callLogUserEntry = callLogSingleEntry;
+                listOfCallers.add(callLogUserEntry);
+            }
+
 
         }
 //        Log.d("listOfLastCallsPerUser size",""+listOfLastCallsPerUser.size());
 //        Log.d("listOfAllCalls size",""+listOfAllCalls.size());
 
-//        TODO FIREBASE
-//        CollectionReference collectionReference = db.collection("Users").document("testUser").collection("Contacts");
+    }
 
-//        collectionReference
-//                .orderBy("phoneNumber", Query.Direction.ASCENDING)
-//
-//
-//
-//                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-//                                         @Override
-//                                         public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-//                                             String contactName = "";
-//                                             String doc_id = "";
-//                                             try {
-//                                                 for (DocumentChange doc : queryDocumentSnapshots.getDocumentChanges()) {
-//                                                     doc_id = doc.getDocument().getId();
-//                                                     String tempCachedName = "";
-//                                                     String tempPhoneNumber = "";
-//                                                     if (doc.getDocument().contains("cachedName")) {
-//                                                         tempCachedName = doc.getDocument().get("cachedName").toString();
-//                                                     }
-//                                                     if (doc.getDocument().contains("phoneNumber")) {
-//                                                         tempPhoneNumber = doc.getDocument().get("phoneNumber").toString();
-//                                                     }
-//
-//                                                     if (doc.getType() == DocumentChange.Type.ADDED) {
-//                                                        if(callers.contains(doc_id)){
-//                                                            System.out.println("+Snapshot ADDED doc_id"+doc_id+" tempPhoneNumber"+tempPhoneNumber+" tempCachedName"+tempCachedName);
-//                                                            CallLogUserStatsModel tempCallLogUserStatsModel = callLogModelUserCallsModelHashMap.get(doc_id);
-//                                                            if(tempCallLogUserStatsModel!=null) {
-//                                                                if (!tempCallLogUserStatsModel.getDownloadedFromCloud()) {
-//                                                                    if (doc.getDocument().contains("cachedName")) {
-//                                                                        if (!isNullOrEmpty(doc.getDocument().get("cachedName").toString())) {
-//                                                                            contactName = doc.getDocument().get("cachedName").toString();
-//                                                                            tempCallLogUserStatsModel.setNameFromCloud(contactName);
-//                                                                            tempCallLogUserStatsModel.setDownloadedFromCloud(true);
-//                                                                            callLogModelUserCallsModelHashMap.put(doc_id,tempCallLogUserStatsModel);
-//                                                                            System.out.println("ADDED: " + doc_id + " ->" + contactName);
-//
-//                                                                            adapter.notifyDataSetChanged();
-//                                                                        }
-//                                                                    }
-//                                                                }
-//                                                            }
-//                                                        }else {
-//                                                            System.out.println("-Snapshot ADDED doc_id"+doc_id+" tempPhoneNumber "+tempPhoneNumber+" tempCachedName "+tempCachedName);
-//                                                        }
-//
-//
-//                                                     }else if (doc.getType() == DocumentChange.Type.MODIFIED) {
-//                                                         System.out.println("Snapshot MODIFIED doc_id"+doc_id+" tempPhoneNumber "+tempPhoneNumber+" tempCachedName "+tempCachedName);
-//                                                     }else if (doc.getType() == DocumentChange.Type.REMOVED) {
-//                                                         System.out.println("Snapshot REMOVED doc_id"+doc_id+" tempPhoneNumber "+tempPhoneNumber+" tempCachedName "+tempCachedName);
-//                                                     }
-//
-//                                                     synchronized(callLogModelUserCallsModelHashMap){
-//                                                         callLogModelUserCallsModelHashMap.notify();
-//                                                     }
-//
-//
-//                                                 }
-//
-//                                                 int i=0;
-//                                                 for (String caller:callers) {
-//                                                     i++;
-////                                                     System.out.println("Caller: "+i+" "+caller);
-//                                                     if (callLogModelUserCallsModelHashMap.containsKey(caller)){
-//                                                     System.out.println("Pobrany z bazy: "  +caller+" "+callLogModelUserCallsModelHashMap.get(caller).getDownloadedFromCloud());
-//                                                     }else {
-//                                                         System.out.println("Nie znaleziono: " +caller);
-//                                                     }
-//                                                 }
-//
-////                                                 callLogModelUserCallsModelHashMap.notifyAll();
-//                                             }catch (NullPointerException e1){
-//                                                 Toast.makeText(activity,"Nie udało się pobrać danych :(",Toast.LENGTH_LONG).show();
-//                                                 System.out.println("Nie udało się pobrać danych :("+e1.getMessage());
-//                                             }
-////                                             x = tempCallLogUserStatsModel;
-//                                             adapter.notifyDataSetChanged();
-//
-//                                         }
-//
-//                                     });
+    private String simplifyPhoneNumber(String cachedFormattedNumber) {
+        String simplePhoneNumber = cachedFormattedNumber.replace(" ", "");
+        simplePhoneNumber = simplePhoneNumber.replace("+48","");
+        return simplePhoneNumber;
+    }
+
+    public List<Sms> getAllSms() {
+        List<Sms> lstSms = new ArrayList<Sms>();
+        Sms objSms = new Sms();
+        Uri message = Uri.parse("content://sms/");
+        ContentResolver cr = activity.getContentResolver();
+
+        Cursor c = cr.query(message, null, null, null, null);
+        activity.startManagingCursor(c);
+        int totalSMS = c.getCount();
+
+        if (c.moveToFirst()) {
+            for (int i = 0; i < totalSMS; i++) {
+
+                objSms = new Sms();
+                objSms.setId(c.getString(c.getColumnIndexOrThrow("_id")));
+                objSms.setAddress(c.getString(c
+                        .getColumnIndexOrThrow("address")));
+                objSms.setMsg(c.getString(c.getColumnIndexOrThrow("body")));
+                objSms.setReadState(c.getString(c.getColumnIndex("read")));
+                objSms.setTime(c.getString(c.getColumnIndexOrThrow("date")));
+                if (c.getString(c.getColumnIndexOrThrow("type")).contains("1")) {
+                    objSms.setFolderName("inbox");
+                } else {
+                    objSms.setFolderName("sent");
+                }
+
+                lstSms.add(objSms);
+                c.moveToNext();
+                /*
+                 * // System.out.println("_id: "+objSms._id+"\n_address: "+objSms._address+"\n_folderName: "+objSms._folderName+"\n_msg: "+objSms._msg+"\n_readState: "+objSms._readState+"\n_time: "+objSms._time+"\n--------------");
+                 */
 
 
-//
-////
-//        collectionReference
-//                .orderBy("phoneNumber", Query.Direction.ASCENDING)
-//                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-//
-//                    @Override
-//                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-//                        String contactName = "";
-//                        String doc_id = "";
-//                        try{
-//                            for (DocumentChange doc : queryDocumentSnapshots.getDocumentChanges()) {
-//                                doc_id = doc.getDocument().getId();
-//                                String tempCachedName = "";
-//                                String tempFormattedCachedNumber = "";
-//                                if (doc.getDocument().contains("cachedName")) {
-//                                    tempCachedName = doc.getDocument().get("cachedName").toString();
-//                                }
-//                                if (doc.getDocument().contains("formattedCachedNumber")) {
-//                                    tempFormattedCachedNumber = doc.getDocument().get("formattedCachedNumber").toString();
-//                                }
-////                                String tempCachedName = doc.getDocument().get("cachedName").toString();
-////                                String tempFormattedCachedNumber = doc.getDocument().get("formattedCachedNumber").toString();
-////                                System.out.println("doc.getDocument().getId() = "+doc_id);
-//
-//                                if (doc.getType() == DocumentChange.Type.ADDED) {
-//                                    CallLogUserStatsModel tempCallLogUserStatsModel = callLogModelUserCallsModelHashMap.get(tempFormattedCachedNumber);
-//                                    if (tempCallLogUserStatsModel!=null) {
-//
-//                                        System.out.println("tempCallLogUserStatsModel!=null :(");
-//                                        if (!tempCallLogUserStatsModel.getDownloadedFromCloud()) {
-//                                            if (doc.getDocument().contains("cachedName")) {
-//                                                if (!isNullOrEmpty(doc.getDocument().get("cachedName").toString())) {
-//                                                    contactName = doc.getDocument().get("cachedName").toString();
-//                                                    tempCallLogUserStatsModel.setNameFromCloud(contactName);
-//                                                    tempCallLogUserStatsModel.setDownloadedFromCloud(true);
-//                                                    System.out.println("ADDED: " + doc_id + " ->" + contactName);
-//                                                }
-//                                            }
-//                                        }
-//                                    }
-//                                    else{
-//                                        System.out.println("doc.getDocument().getId() = "+doc_id+" tempCallLogUserStatsModel==null :(");
-//                                    }
-//                                } else if (doc.getType() == DocumentChange.Type.MODIFIED) {
-////                                    (""+cachedFormattedNumber
-//                                    CallLogUserStatsModel tempCallLogUserStatsModel = callLogModelUserCallsModelHashMap.get(""+doc_id);
-//                                    if (tempCallLogUserStatsModel!=null) {
-//                                        if (!tempCallLogUserStatsModel.getDownloadedFromCloud()) {
-//                                            if (doc.getDocument().contains("cachedName")) {
-//                                                if (!isNullOrEmpty(doc.getDocument().get("cachedName").toString())) {
-//                                                    contactName = doc.getDocument().get("cachedName").toString();
-//                                                    tempCallLogUserStatsModel.setNameFromCloud(""+contactName);
-//                                                    tempCallLogUserStatsModel.setDownloadedFromCloud(true);
-//                                                    System.out.println("MODIFIED: " + doc_id + " ->" + contactName);
-//                                                }
-//                                            }
-//                                        }
-//                                    }
-//                                } else if (doc.getType() == DocumentChange.Type.REMOVED) {
-////                                    list.remove(doc.getOldIndex());
-////                                    mAdapter.notifyItemRemoved(doc.getOldIndex());
-////                                    getSupportActionBar().setTitle("Users ("+list.size()+")");
-//                                }
-//                            }
-//
-//                            adapter.notifyDataSetChanged();
-//
-////                            Toast.makeText(activity,"Liczba pobranych z bazy: "+callersFromCloud.size(),Toast.LENGTH_LONG).show();
-////                            for (CallLogModel call:listOfAllCalls) {
-////                                if(call.getCachedName()==call.getCachedFormattedNumber()){
-////                                    String newName = callersFromCloud.get(call.getCachedName());
-////                                    call.setDownloadedFromDatabase(true);
-////                                    call.setCachedName(newName);
-////                                }
-////                            }
-//
-//
-//                        }catch (NullPointerException e1){
-//                            Toast.makeText(activity,"Nie udało się pobrać danych :(",Toast.LENGTH_LONG).show();
-//                            System.out.println("Nie udało się pobrać danych :("+e1.getMessage());
-//                        }
-//                    }
-//                });
+            }
+        }
+        // else {
+        // throw new RuntimeException("You have no SMS");
+        // }
+        c.close();
 
+//            System.out.println("Liczba SMSów: "+lstSms.size());
+        return lstSms;
+    }
+    public class Sms{
+        private String _id;
+        private String _address;
+        private String _msg;
+        private String _readState; //"0" for have not read sms and "1" for have read sms
+        private String _time;
+        private String _folderName;
+
+        public String getId(){
+            return _id;
+        }
+        public String getAddress(){
+            return _address;
+        }
+        public String getMsg(){
+            return _msg;
+        }
+        public String getReadState(){
+            return _readState;
+        }
+        public String getTime(){
+            return _time;
+        }
+        public String getFolderName(){
+            return _folderName;
+        }
+
+
+        public void setId(String id){
+            _id = id;
+        }
+        public void setAddress(String address){
+            _address = address;
+        }
+        public void setMsg(String msg){
+            _msg = msg;
+        }
+        public void setReadState(String readState){
+            _readState = readState;
+        }
+        public void setTime(String time){
+            _time = time;
+        }
+        public void setFolderName(String folderName){
+            _folderName = folderName;
+        }
 
     }
 
-    private Cursor getCursor() {
+//    public List<String> getSMS(){
+//        if(ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED){
+//            List<String> sms = new ArrayList<>();
+//            Uri uriSMSURI = Uri.parse("content://sms/all");
+//            Cursor cur = activity.getContentResolver().query(uriSMSURI, null, null, null, null);
+//
+//            while (cur != null && cur.moveToNext()) {
+//                String address = cur.getString(cur.getColumnIndex("address"));
+//                String body = cur.getString(cur.getColumnIndexOrThrow("body"));
+//                sms.add("Number: " + address + " .Message: " + body);
+//                System.out.println("Number: " + address + " .Message: " + body);
+//            }
+//
+//            if (cur != null) {
+//                cur.close();
+//            }
+//            System.out.println("Liczba SMSów: "+sms.size());
+//
+//            return sms;
+//        }
+//        Toast.makeText(getContext(),"Brak Manifest.permission.READ_SMS",Toast.LENGTH_LONG).show();
+//        System.out.println("Brak uprawnień Manifest.permission.READ_SMS");
+//        return null;
+//
+//    }
+//    private Cursor getSMSCursor(){
+//
+////        List<Sms> lstSms = new ArrayList<Sms>();
+////        Sms objSms = new Sms();
+//        Uri message = Uri.parse("content://sms/");
+////        Cursor managedCursor = activity.getContentResolver().query(message, null, null, null, null);
+//        String[] details = new String[]{"_id",                   //0
+//                "_address",                                             //1
+//                "_folderName",                                         //2
+//                "_msg",                                      //3
+//                "_readState",                                              //4
+//                "_time"
+//                //    _id: 3353
+//                //    _address: +48886131121
+//                //    _folderName: inbox
+//                //    _msg: Panie Wojtku mam video spotkanie, jak coś pilnego proszę pisać, ja mogę zadzwonic za dwie godziny ok ?
+//                //    _readState: 1
+//                //    _time: 1588059461040
+//        };
+////        Cursor c = cr
+////        activity.startManagingCursor(c);
+////        int totalSMS = c.getCount();
+//        Cursor cursor;
+//        cursor = context.getContentResolver().query(message, details, null, null, "_id" + " DESC");
+//        if (cursor.getCount() != 0) {
+//            cursor.moveToFirst();
+//        }
+//
+//        Toast.makeText(getActivity(),"[SMS] Liczba pozycji po wykonaniu getCursor() = "+cursor.getCount(),Toast.LENGTH_LONG).show();
+//        return cursor;
+//    }
+
+    private Cursor getCallLogCursor() {
         if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_CALL_LOG) == PackageManager.PERMISSION_GRANTED) {
             Cursor managedCursor = context.getContentResolver().query(CallLog.Calls.CONTENT_URI, null, null, null, null);
             String[] details = new String[]{CallLog.Calls.NUMBER,                   //0

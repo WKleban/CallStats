@@ -21,11 +21,23 @@ class CallLogModel {
     private int durationOfTheWhole;
     private int numberOfCalls;
 
+    private SmsModel lastSms;
+
 
     public CallLogModel() {
     }
 
+    public CallLogModel(SmsModel lastSms, String cachedName) {
+        this.lastSms = lastSms;
+        this.phoneNumber = lastSms.get_address();
+        this.cachedName = cachedName;
+    }
 
+    public CallLogModel(SmsModel lastSms,String phoneNumber,String cachedName) {
+        this.lastSms = lastSms;
+        this.phoneNumber = phoneNumber;
+        this.cachedName = cachedName;
+    }
 
     //    CallLogModel callLogEntry = new CallLogModel(phoneNumber, type, duration, cachedName, callID, callDate, cachedFormattedNumber, countryISO, lastModified, isNew ,phoneAccountId, androidId, phoneModel);
     public CallLogModel(String phoneNumber, int type, int duration, String cachedName, int callID, Date callDate, String cachedFormattedNumber, String countryISO, Date lastModified, boolean isNew, String phoneAccountId, String androidId, String phoneModel,int durationOfTheWhole,int numberOfCalls) {
@@ -45,6 +57,27 @@ class CallLogModel {
         this.isDownloadedFromDatabase = false;
         this.durationOfTheWhole = durationOfTheWhole;
         this.numberOfCalls = numberOfCalls;
+        this.lastSms = null;
+    }
+
+    public CallLogModel(String phoneNumber, int type, int duration, String cachedName, int callID, Date callDate, String cachedFormattedNumber, String countryISO, Date lastModified, boolean isNew, String phoneAccountId, String androidId, String phoneModel,int durationOfTheWhole,int numberOfCalls,SmsModel lastSms) {
+        this.phoneNumber = phoneNumber;
+        this.type = type;
+        this.duration = duration;
+        this.cachedName = cachedName;
+        this.callID = callID;
+        this.callDate = callDate;
+        this.cachedFormattedNumber = cachedFormattedNumber;
+        this.countryISO = countryISO;
+        this.lastModified = lastModified;
+        this.isNew = isNew;
+        this.androidId = androidId;
+        this.phoneModel = phoneModel;
+        this.phoneAccountId = phoneAccountId;
+        this.isDownloadedFromDatabase = false;
+        this.durationOfTheWhole = durationOfTheWhole;
+        this.numberOfCalls = numberOfCalls;
+        this.lastSms = lastSms;
     }
 
     public String getPhoneAccountId() {
@@ -174,5 +207,13 @@ class CallLogModel {
 
     public void setDownloadedFromDatabase(boolean downloadedFromDatabase) {
         isDownloadedFromDatabase = downloadedFromDatabase;
+    }
+
+    public SmsModel getLastSms() {
+        return lastSms;
+    }
+
+    public void setLastSms(SmsModel lastSms) {
+        this.lastSms = lastSms;
     }
 }

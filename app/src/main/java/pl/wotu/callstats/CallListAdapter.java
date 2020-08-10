@@ -54,6 +54,27 @@ public class CallListAdapter extends RecyclerView.Adapter<CallListAdapter.CallLo
         int durationOfTheWhole = listOfEntries.get(position).getDurationOfTheWhole();
         int duration = listOfEntries.get(position).getDuration();
         int numberOfCalls = listOfEntries.get(position).getNumberOfCalls();
+        SmsModel lastSms = listOfEntries.get(position).getLastSms();
+        if (lastSms!=null){
+            holder.single_local_sms_body.setVisibility(View.VISIBLE);
+            holder.single_local_sms_date.setVisibility(View.VISIBLE);
+            holder.single_local_sms_icon_iv.setVisibility(View.VISIBLE);
+
+            if (lastSms.get_folderName()=="sent"){ //Jeśli wysłane to dopisz słowo "Ty: " jako prefix smsa
+                holder.single_local_sms_body.setText("Ty: "+lastSms.get_msg());
+            }else{
+                holder.single_local_sms_body.setText(lastSms.get_msg());
+            }
+
+
+            holder.single_local_sms_date.setText(TimeAgo.callDateFormatter(new Date(Long.parseLong(lastSms.get_time()))));
+            //TODO !!!!!!!!!!!!!!!!!!! :)
+
+        }else {
+            holder.single_local_sms_body.setVisibility(View.GONE);
+            holder.single_local_sms_date.setVisibility(View.GONE);
+            holder.single_local_sms_icon_iv.setVisibility(View.GONE);
+        }
 
 //        int lastCallDuration = listOfEntries.get(position).getLastCallDuration();
 
@@ -65,6 +86,7 @@ public class CallListAdapter extends RecyclerView.Adapter<CallListAdapter.CallLo
         String androidId = listOfEntries.get(position).getAndroidId();
         String cachedNameFromDatabase = listOfEntries.get(position).getCachedName();
         boolean isDownloadedFromDatabase = listOfEntries.get(position).isDownloadedFromDatabase();
+
 
         String dateString = TimeAgo.callDateFormatter(lastCallDate);
 
@@ -203,9 +225,10 @@ public class CallListAdapter extends RecyclerView.Adapter<CallListAdapter.CallLo
 
     public class CallLogViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView phoneNumber_tv,name_tv,user_duration_tv,last_call_duration_tv,callDate_tv,single_local_counter;
-        private ImageView more_iv,type_iv,phone_icon;
+        private TextView phoneNumber_tv,name_tv,user_duration_tv,last_call_duration_tv,callDate_tv,single_local_counter,single_local_sms_date,single_local_sms_body;
+        private ImageView more_iv,type_iv,phone_icon,single_local_sms_icon_iv;
         private ConstraintLayout single_local_last_call_layout,single_local_details_layout;
+
 
         public CallLogViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -221,6 +244,10 @@ public class CallListAdapter extends RecyclerView.Adapter<CallListAdapter.CallLo
             single_local_details_layout = itemView.findViewById(R.id.single_local_details_layout);
 
             single_local_counter = itemView.findViewById(R.id.single_local_counter);
+
+            single_local_sms_body = itemView.findViewById(R.id.single_local_sms_body);
+            single_local_sms_date = itemView.findViewById(R.id.single_local_sms_date);
+            single_local_sms_icon_iv = itemView.findViewById(R.id.single_local_sms_icon_iv);
 
         }
     }
