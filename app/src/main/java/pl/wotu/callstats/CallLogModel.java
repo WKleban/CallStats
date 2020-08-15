@@ -1,8 +1,16 @@
 package pl.wotu.callstats;
 
+import android.text.format.DateFormat;
+import android.util.Log;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 class CallLogModel {
+    private static final String TAG = "CallLogModel";
     private String phoneAccountId;
     private String phoneNumber;
     private int type;
@@ -10,6 +18,7 @@ class CallLogModel {
     private String cachedName;
     private int callID;
     private Date callDate;
+    private Date lastActivityDate;
     private String cachedFormattedNumber;
     private String countryISO;
     private Date lastModified;
@@ -58,6 +67,8 @@ class CallLogModel {
         this.durationOfTheWhole = durationOfTheWhole;
         this.numberOfCalls = numberOfCalls;
         this.lastSms = null;
+
+        this.lastActivityDate = callDate;
     }
 
     public CallLogModel(String phoneNumber, int type, int duration, String cachedName, int callID, Date callDate, String cachedFormattedNumber, String countryISO, Date lastModified, boolean isNew, String phoneAccountId, String androidId, String phoneModel,int durationOfTheWhole,int numberOfCalls,SmsModel lastSms) {
@@ -78,6 +89,27 @@ class CallLogModel {
         this.durationOfTheWhole = durationOfTheWhole;
         this.numberOfCalls = numberOfCalls;
         this.lastSms = lastSms;
+
+        if ((lastSms.get_time()!=null)&&(callDate!=null)){
+            updateLastActivityDate();
+//            long lastSmsLong = Long.parseLong(lastSms.get_time());
+//            long callDateLong = callDate.getTime();
+//            if (lastSmsLong>callDateLong){
+//                this.lastActivityDate.setTime(Long.parseLong(lastSms.get_time()));
+//            }else {
+//                this.lastActivityDate = callDate;
+//            }
+        }else if((lastSms.get_time()==null)&&(callDate!=null)){
+            this.lastActivityDate = callDate;
+
+        }else if((lastSms.get_time()!=null)&&(callDate==null)){
+            this.lastActivityDate.setTime(Long.parseLong(lastSms.get_time()));
+        }else{//null z obu stron
+            this.lastActivityDate = null;
+        }
+
+
+
     }
 
     public String getPhoneAccountId() {
@@ -150,6 +182,31 @@ class CallLogModel {
 
     public void setCallDate(Date callDate) {
         this.callDate = callDate;
+        updateLastActivityDate();
+
+
+    }
+
+    private void updateLastActivityDate() {
+        if (callDate!=null){
+            long lastSmsLong = Long.parseLong(lastSms.get_time());
+            long callDateLong = callDate.getTime();
+            if (lastSmsLong>callDateLong){
+                Log.d(TAG, "updateLastActivityDate: Porównywanie "+lastSmsLong+" > "+Long.parseLong(lastSms.get_time()));
+//                System.out.println();
+                this.lastActivityDate.setTime(Long.parseLong(lastSms.get_time()));
+            }else if (lastSmsLong<callDateLong) {
+//                System.out.println("Porównywanie "+lastSmsLong+" < "+Long.parseLong(lastSms.get_time()));
+
+                Log.d(TAG, "updateLastActivityDate: Porównywanie "+lastSmsLong+" > "+Long.parseLong(lastSms.get_time()));
+                this.lastActivityDate = callDate;
+            }
+            else {
+//                System.out.println("Porównywanie "+lastSmsLong+" = "+Long.parseLong(lastSms.get_time()));
+
+                Log.d(TAG, "updateLastActivityDate: Porównywanie "+lastSmsLong+" > "+Long.parseLong(lastSms.get_time()));
+            }
+        }
     }
 
     public String getCachedFormattedNumber() {
@@ -215,5 +272,7 @@ class CallLogModel {
 
     public void setLastSms(SmsModel lastSms) {
         this.lastSms = lastSms;
+
+        updateLastActivityDate();
     }
 }

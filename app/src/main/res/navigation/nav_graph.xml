@@ -23,6 +23,7 @@
         <action
             android:id="@+id/action_localCallLogFragment_to_firebaseCallLogFragment"
             app:destination="@id/firebaseCallLogFragment" />
+
     </fragment>
     <activity
         android:id="@+id/chooseCallMethodActivity"

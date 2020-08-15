@@ -6,6 +6,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,7 +14,6 @@ import android.provider.CallLog;
 import android.provider.Settings;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,21 +24,21 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
+
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -47,6 +47,8 @@ import java.util.Set;
  */
 public class LocalCallLogFragment extends Fragment {
     private static final String TAG = "LocalCallLogFragment";
+
+    private static final int CALL_LOG_PERMISSIONS_REQUEST_CODE = 101;
 
     private Activity activity;
     private Context context;
@@ -64,6 +66,7 @@ public class LocalCallLogFragment extends Fragment {
     private Set<String> setOfCallers;
 
     private boolean isReadyListOfCalls=false;
+    private Snackbar snackbar;
 
     public LocalCallLogFragment() {
         // Required empty public constructor
@@ -89,13 +92,56 @@ public class LocalCallLogFragment extends Fragment {
         if(telephonyManger != null) {
             telephonyManger.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
         }
-
         navController = Navigation.findNavController(view);
+        checkAllPermissions();
+    }
 
-//        getAllSms();
+    private void checkAllPermissions() {
+        if (hasPermissions(getContext(),
+                Manifest.permission.READ_CONTACTS,
+                Manifest.permission.READ_SMS,
+                Manifest.permission.CALL_PHONE,
+                Manifest.permission.READ_CALL_LOG,
+                Manifest.permission.READ_PHONE_STATE)){
+            setCallLogToRecyclerView();
+        }else {
+            snackbar = Snackbar
+                    .make(getView(), "Bez uprawnień nic tu nie zrobimy:(", Snackbar.LENGTH_INDEFINITE)
+                    .setActionTextColor(Color.RED)
+                    .setDuration(BaseTransientBottomBar.LENGTH_INDEFINITE)
+
+                    .setAction("Sprawdź", view1 -> {
+                        String[] permissionNames = new String[]{
+                                Manifest.permission.READ_CONTACTS,
+                                Manifest.permission.READ_SMS,
+                                Manifest.permission.CALL_PHONE,
+                                Manifest.permission.READ_CALL_LOG,
+                                Manifest.permission.READ_PHONE_STATE};
+                        requestPermissions(permissionNames, CALL_LOG_PERMISSIONS_REQUEST_CODE);
+                    });
+
+            snackbar.show();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        System.out.println("onRequestPermissionsResult requestCode="+requestCode);
+        Toast.makeText(getContext(),"onRequestPermissionsResult requestCode="+requestCode,Toast.LENGTH_LONG).show();
+
+        checkAllPermissions();
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        if (Build.VERSION.SDK_INT >= 26) {
+            ft.setReorderingAllowed(false);
+        }
+    }
+
+    private void setCallLogToRecyclerView() {
 
         mapOfCallers = new HashMap<>();
         setOfCallers = new HashSet<>();
+        listOfCalls = new ArrayList<>();
+        listOfCallers = new ArrayList<>();
 
         if (!isReadyListOfCalls) {
             setCallLogToList(getCallLogCursor(),getAllSms());
@@ -113,7 +159,20 @@ public class LocalCallLogFragment extends Fragment {
         recyclerView.setAdapter(adapter);
 
         adapter = new CallListAdapter(getActivity(), listOfCalls);
-//        getSMSCursor();
+    }
+
+    public static boolean hasPermissions(Context context, String... permissions) {
+        boolean returnValue = true;
+        if (context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    returnValue =  false;
+                    System.out.println("Permission "+permission +" is not granted");
+                }
+            }
+
+        }
+        return returnValue;
     }
 
     private void setCallLogToList(Cursor cursor, List<Sms> allSms) {
@@ -143,13 +202,13 @@ public class LocalCallLogFragment extends Fragment {
         String getNumber_1 = card0.get("getNumber");
         String getDataRoaming_1 = card0.get("getDataRoaming");
 
-        Date startDate = null,endDate=null;
-        try {
-            startDate=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2020-04-01 00:00:00");
-            endDate=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2020-04-30 23:59:59");
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+//        Date startDate = null,endDate=null;
+//        try {
+//            startDate=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2020-04-01 00:00:00");
+//            endDate=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2020-04-30 23:59:59");
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
 
         listOfCalls = new ArrayList<>();
         listOfCallers = new ArrayList<>();
@@ -216,7 +275,8 @@ public class LocalCallLogFragment extends Fragment {
             SmsModel smsModel = new SmsModel(sms._id,sms._address,sms._msg,sms._readState,sms._time,sms._folderName);
 
             CallLogModel callLogSingleEntry = new CallLogModel(sms._address, 0, 0, sms._address, 0,  null,sms._address, null, null, false ,null, androidId, phoneModel,0,1);
-            listOfCalls.add(callLogSingleEntry);
+            //??
+            //            listOfCalls.add(callLogSingleEntry);
 
             String caller = simplifyPhoneNumber(sms._address);
 //            if (!CallAppConfig.isNullOrEmpty(sms._address)){
@@ -233,6 +293,7 @@ public class LocalCallLogFragment extends Fragment {
                 if (callLogUserEntry.getLastSms()==null){
                     callLogUserEntry.setLastSms(smsModel);
                 }else {
+//                    callLogUserEntry.getCallDate().
                     //Głupie rozwiązanie ale działa
                     long x = Long.parseLong(smsModel.get_time().trim());
                     long y = Long.parseLong(callLogUserEntry.getLastSms().get_time());
@@ -252,32 +313,14 @@ public class LocalCallLogFragment extends Fragment {
 
 
             }else {
-                callLogUserEntry = new CallLogModel(smsModel,null);
-
-
-                setOfCallers.add(caller);
-            }
-
-
-//            int indexOfEntry = 0;
-
-            if (mapOfCallers.containsKey(caller)){
-
-
-//                callLogUserEntry.setNumberOfCalls(callLogUserEntry.getNumberOfCalls()+1);
-//                callLogUserEntry.setDurationOfTheWhole(callLogUserEntry.getDurationOfTheWhole()+duration);
-
-
-
-            }else {
-                callLogUserEntry = callLogSingleEntry;
-                listOfCallers.add(callLogUserEntry);
+                //Wyświetlanie tych rozmówców którzy nie dzwonili (tylko sms)
+                // NIEAKTYWNE
+//                callLogUserEntry = new CallLogModel(smsModel,null);
+//                setOfCallers.add(caller);
             }
 
 
         }
-//        Log.d("listOfLastCallsPerUser size",""+listOfLastCallsPerUser.size());
-//        Log.d("listOfAllCalls size",""+listOfAllCalls.size());
 
     }
 
@@ -288,7 +331,7 @@ public class LocalCallLogFragment extends Fragment {
     }
 
     public List<Sms> getAllSms() {
-        List<Sms> lstSms = new ArrayList<Sms>();
+        List<Sms> lstSms = new ArrayList<>();
         Sms objSms = new Sms();
         Uri message = Uri.parse("content://sms/");
         ContentResolver cr = activity.getContentResolver();
@@ -315,19 +358,12 @@ public class LocalCallLogFragment extends Fragment {
 
                 lstSms.add(objSms);
                 c.moveToNext();
-                /*
-                 * // System.out.println("_id: "+objSms._id+"\n_address: "+objSms._address+"\n_folderName: "+objSms._folderName+"\n_msg: "+objSms._msg+"\n_readState: "+objSms._readState+"\n_time: "+objSms._time+"\n--------------");
-                 */
-
 
             }
         }
-        // else {
-        // throw new RuntimeException("You have no SMS");
-        // }
+
         c.close();
 
-//            System.out.println("Liczba SMSów: "+lstSms.size());
         return lstSms;
     }
     public class Sms{
@@ -379,62 +415,6 @@ public class LocalCallLogFragment extends Fragment {
 
     }
 
-//    public List<String> getSMS(){
-//        if(ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED){
-//            List<String> sms = new ArrayList<>();
-//            Uri uriSMSURI = Uri.parse("content://sms/all");
-//            Cursor cur = activity.getContentResolver().query(uriSMSURI, null, null, null, null);
-//
-//            while (cur != null && cur.moveToNext()) {
-//                String address = cur.getString(cur.getColumnIndex("address"));
-//                String body = cur.getString(cur.getColumnIndexOrThrow("body"));
-//                sms.add("Number: " + address + " .Message: " + body);
-//                System.out.println("Number: " + address + " .Message: " + body);
-//            }
-//
-//            if (cur != null) {
-//                cur.close();
-//            }
-//            System.out.println("Liczba SMSów: "+sms.size());
-//
-//            return sms;
-//        }
-//        Toast.makeText(getContext(),"Brak Manifest.permission.READ_SMS",Toast.LENGTH_LONG).show();
-//        System.out.println("Brak uprawnień Manifest.permission.READ_SMS");
-//        return null;
-//
-//    }
-//    private Cursor getSMSCursor(){
-//
-////        List<Sms> lstSms = new ArrayList<Sms>();
-////        Sms objSms = new Sms();
-//        Uri message = Uri.parse("content://sms/");
-////        Cursor managedCursor = activity.getContentResolver().query(message, null, null, null, null);
-//        String[] details = new String[]{"_id",                   //0
-//                "_address",                                             //1
-//                "_folderName",                                         //2
-//                "_msg",                                      //3
-//                "_readState",                                              //4
-//                "_time"
-//                //    _id: 3353
-//                //    _address: +48886131121
-//                //    _folderName: inbox
-//                //    _msg: Panie Wojtku mam video spotkanie, jak coś pilnego proszę pisać, ja mogę zadzwonic za dwie godziny ok ?
-//                //    _readState: 1
-//                //    _time: 1588059461040
-//        };
-////        Cursor c = cr
-////        activity.startManagingCursor(c);
-////        int totalSMS = c.getCount();
-//        Cursor cursor;
-//        cursor = context.getContentResolver().query(message, details, null, null, "_id" + " DESC");
-//        if (cursor.getCount() != 0) {
-//            cursor.moveToFirst();
-//        }
-//
-//        Toast.makeText(getActivity(),"[SMS] Liczba pozycji po wykonaniu getCursor() = "+cursor.getCount(),Toast.LENGTH_LONG).show();
-//        return cursor;
-//    }
 
     private Cursor getCallLogCursor() {
         if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_CALL_LOG) == PackageManager.PERMISSION_GRANTED) {
@@ -476,7 +456,6 @@ public class LocalCallLogFragment extends Fragment {
 
 
             } else if (state == TelephonyManager.CALL_STATE_IDLE) {
-//                setCallLogToList(getCursor());
                 isReadyListOfCalls = true;
 
             }
